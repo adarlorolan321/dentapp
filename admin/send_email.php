@@ -23,14 +23,11 @@ $mail->isSMTP();
 $mail->Host = 'smtp.gmail.com';  // Specify your SMTP server
 $mail->SMTPAuth = true;
 $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; 
-$mail->Username = 'Adarlo Rolan Morante';
-$mail->Password = 'Sasuke17*';
+
 $mail->SMTPSecure = 'tls';
 $mail->Port = 587;
 
 // Set the sender and recipient email addresses
-$mail->setFrom('adarlorolan14@gmail.com', 'Sender Name');
-$mail->addAddress('jeaniah.arevir@gmail.com', 'Recipient Name');
 
 // Set the email subject and body
 $mail->Subject = 'Test Email';
