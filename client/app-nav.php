@@ -14,6 +14,8 @@
           <li><a href="index.php">Home</a></li>
           <li><a href="calendar">View Slots</a></li>
           <li><a href="app-service.php">Services</a></li>
+          <li><a href="patient_history.php">Xray History</a></li>
+          
           <!--li><a href="messages.php">Message</a></li>
           <li><a href="profile.php">Profile</a></li-->
           <li class="btn-trial"><a href="logout.php?logout" onclick="return confirm('Are you sure you want to Logout?')">Logout</a></li>

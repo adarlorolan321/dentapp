@@ -17,6 +17,8 @@ if(isset($_POST['btn-save']))
     $dates = $stdate->format('Y-m-d');
     $created = $date->format('Y-m-d H:i:s');
     $start_event = $stdate->format('Y-m-d H:i:s');
+    $modifiedRaw= new DateTime();
+    $modified= $modifiedRaw->format('Y-m-d H:i:s');
     //$end_event = $endate->format('Y-m-d H:i:s');
     $end_event = date('Y-m-d H:i:s',$end_event);
 
@@ -62,8 +64,8 @@ if(isset($_POST['btn-save']))
         else {
 
         $stmt = $DB_con->prepare('INSERT INTO events
-            (patient_id, title, dates, created, start_event, end_event)
-            VALUES(:pid, :title, :dates, :created, :start_event, :end_event)');
+            (patient_id, title, dates, created, start_event, end_event, modified)
+            VALUES(:pid, :title, :dates, :created, :start_event, :end_event, :modified)');
 
           $stmt->bindParam(':pid',$pid);
           $stmt->bindParam(':title',$title);
@@ -71,6 +73,7 @@ if(isset($_POST['btn-save']))
           $stmt->bindParam(':created',$created);    
           $stmt->bindParam(':start_event',$start_event);
           $stmt->bindParam(':end_event',$end_event);
+          $stmt->bindParam(':modified',$modified);
 
        
           if($stmt->execute()){

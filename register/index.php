@@ -1,131 +1,129 @@
 <?php
 
-  error_reporting( ~E_NOTICE );
-  
-  require_once '../admin/dbcon.php';
-  require '../client/PHPMailer/class.phpmailer.php';
-require '../client/PHPMailer/class.smtp.php';  
-  if(isset($_POST['btn_save_updates']))
-  {
+error_reporting(~E_NOTICE);
+
+require_once '../admin/dbcon.php';
+require '../client/PHPMailer/class.phpmailer.php';
+require '../client/PHPMailer/class.smtp.php';
+if (isset($_POST['btn_save_updates'])) {
     $lastname = $_POST['lastname'];
     $firstname = $_POST['firstname'];
-  
+
     $contact = $_POST['contact'];
     $email = $_POST['email'];
     $address = $_POST['address'];
     $type = $_POST['type'];
     $username = $_POST['username'];
     $password = $_POST['password'];
-    
+    $birthday = $_POST['birthday'];
+    $gender = $_POST['gender'];
+
     // validate data
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)){
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errMSG = "Enter a  valid email";
     }
 
     // Password length
-    if (strlen($password) <= 6){
+    if (strlen($password) <= 6) {
         $errMSG = "Choose a password longer then 6 character";
     }
 
 
     // if no error occured, continue ....
-    if(!isset($errMSG)) 
-    {
+    if (!isset($errMSG)) {
         $sthandler = $DB_con->prepare("SELECT username FROM patient WHERE username = :username");
         $sthandler->bindParam(':username', $username);
         $sthandler->execute();
 
-        if($sthandler->rowCount() > 0){
+        if ($sthandler->rowCount() > 0) {
             $errMSG = "User Name exists";
-        } 
-        else 
-        {
-          $stmt = $DB_con->prepare('INSERT INTO patient
-            (lastname, firstname, contact, email, address, type, username, password)
-            VALUES(:lastname, :firstname, :contact, :email, :address, :type, :username, :password)');
+        } else {
+            $stmt = $DB_con->prepare('INSERT INTO patient
+            (lastname, firstname, contact, email, address, type, username, password, birthday, gender)
+            VALUES(:lastname, :firstname, :contact, :email, :address, :type, :username, :password, :birthday, :gender)');
 
-          $stmt->bindParam(':lastname',$lastname);
-          $stmt->bindParam(':firstname',$firstname);
-          
-          $stmt->bindParam(':contact',$contact);
-          $stmt->bindParam(':email',$email);
-          $stmt->bindParam(':address',$address);
-          $stmt->bindParam(':type',$type);
-          $stmt->bindParam(':username',$username);
-          $stmt->bindParam(':password',md5($password)); 
-       
-          if($stmt->execute()){
-        
-            $mail = new PHPMailer();
-            $mail->IsSMTP(); 
-            $mail->Mailer = "smtp";
-             $mail->Port = 465;
-              $mail->SMTPSecure = 'ssl';
-               $mail->Host = "smtp.gmail.com";
-            $mail->SMTPAuth = true; // turn on SMTP authentication
-            $mail->Username = "adarlorolan14@gmail.com"; // SMTP username
-            $mail->Password = "xjjydoedxqpmbhha"; // SMTP password 
-            $mail->Priority = 1;
+            $stmt->bindParam(':lastname', $lastname);
+            $stmt->bindParam(':firstname', $firstname);
 
-            $mail->AddAddress($email,"");
-            $mail->SetFrom('adarlorolan14@gmail.com', 'Search Dev');
-            $mail->AddReplyTo('adarlorolan14@gmail.com', 'Search Dev');
+            $stmt->bindParam(':contact', $contact);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':address', $address);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':gender', $gender);
+            $stmt->bindParam(':birthday', $birthday);
+            $stmt->bindParam(':password', md5($password));
 
-            $mail->Subject  = "Order Details";
-            $mail->Body     =
-            $mail->WordWrap = 50;  
+            if ($stmt->execute()) {
 
-            if(!$mail->Send()) {
-            echo 'Message was not sent.';
-            echo 'Mailer error: ' . $mail->ErrorInfo;
-            } else {
-            echo 'Message has been sent.';
-            } 
-            header("location:signup.php");
+                $mail = new PHPMailer();
+                $mail->IsSMTP();
+                $mail->Mailer = "smtp";
+                $mail->Port = 465;
+                $mail->SMTPSecure = 'ssl';
+                $mail->Host = "smtp.gmail.com";
+                $mail->SMTPAuth = true; // turn on SMTP authentication
+                $mail->Username = "adarlorolan14@gmail.com"; // SMTP username
+                $mail->Password = "xjjydoedxqpmbhha"; // SMTP password 
+                $mail->Priority = 1;
+
+                $mail->AddAddress($email, "");
+                $mail->SetFrom('adarlorolan14@gmail.com', 'Search Dev');
+                $mail->AddReplyTo('adarlorolan14@gmail.com', 'Search Dev');
+
+                $mail->Subject  = "Order Details";
+                $mail->Body     =
+                    $mail->WordWrap = 50;
+
+                if (!$mail->Send()) {
+                    echo 'Message was not sent.';
+                    echo 'Mailer error: ' . $mail->ErrorInfo;
+                } else {
+                    echo 'Message has been sent.';
+                }
+                header("location:signup.php");
             }
         }
-    }
-    else{
+    } else {
         $errMSG;
     }
-    
 
-    
-      $sql = "INSERT INTO log(user_name, change_time, action_made) 
-              VALUES ('".$firstname." ".$lastname."',NOW(),'new Client added.')";
-      $stmt= $DB_con->prepare($sql);
-      $stmt->execute();    
-              
-  }
-  
+
+
+    $sql = "INSERT INTO log(user_name, change_time, action_made) 
+              VALUES ('" . $firstname . " " . $lastname . "',NOW(),'new Client added.')";
+    $stmt = $DB_con->prepare($sql);
+    $stmt->execute();
+}
+
 ?>
 
- <?php include('header.php'); ?>  
+<?php include('header.php'); ?>
 
 <body>
-                
-    <div class="page-wrapper bg-gra-03 p-t-45 p-b-50">  
+
+    <div class="page-wrapper bg-gra-03 p-t-45 p-b-50">
 
         <div class="wrapper wrapper--w790">
-             
+
             <div class="card card-5">
-            
+
                 <div class="card-heading">
                     <h2 class="title">Register here </h2>
                 </div>
                 <!--lastname, :firstname, :mi, :contact, :email, :address, :type, :idnumber, :position-->
                 <div class="card-body">
-                     
-                     <?php
-                            if(isset($errMSG))
-                            {
-                                  ?><h3 style="color: red;">
-                                  <div class="name">
-                                      <?php echo $errMSG; ?> !
-                                  </div></h3>
-                                  <?php
-                            }
-                     ?>
+
+                    <?php
+                    if (isset($errMSG)) {
+                    ?><h3 style="color: red;">
+                            <div class="name">
+                                <?php echo $errMSG; ?> !
+                            </div>
+                        </h3>
+                    <?php
+                    }
+                    ?>
                     <form method="POST">
                         <div class="form-row m-b-55">
                             <div class="name">Name</div>
@@ -171,15 +169,12 @@ require '../client/PHPMailer/class.smtp.php';
                                 </div>
                             </div>
                         </div>
-                        
-                        
-                      
                         <div class="form-row">
-                            <div class="name">Client Type</div>
+                            <div class="name">Gender</div>
                             <div class="value">
                                 <div class="input-group">
                                     <div class="rs-select2 js-select-simple select--no-search">
-                                        <select name="type">
+                                        <select name="gender">
                                             <option disabled="disabled" selected="selected" required>Choose option</option>
                                             <option>Student</option>
                                             <option>Employee</option>
@@ -191,9 +186,36 @@ require '../client/PHPMailer/class.smtp.php';
                             </div>
                         </div>
 
+                        <div class="form-row">
+                            <div class="name">Birth Day</div>
+                            <div class="value">
+                                <div class="input-group">
+                                    <input class="input--style-5" type="date" name="birthday" required>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="name">Client Type</div>
+                            <div class="value">
+                                <div class="input-group">
+                                    <div class="rs-select2 js-select-simple select--no-search">
+                                        <select name="type">
+                                            <option disabled="disabled" selected="selected" required>Choose option</option>
+                                            <option>Male</option>
+                                            <option>Female</option>
+                                            <option>Others</option>
+                                        </select>
+                                        <div class="select-dropdown"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="form-row m-b-55">
-                        <div class="name">Account</div>
-                        <div class="value">
+                            <div class="name">Account</div>
+                            <div class="value">
                                 <div class="row row-space">
                                     <div class="col-2">
                                         <div class="input-group-desc">
@@ -202,114 +224,102 @@ require '../client/PHPMailer/class.smtp.php';
                                         </div>
                                     </div>
                                     <div class="col-2">
-                                        <div class="input-group-desc"> 
+                                        <div class="input-group-desc">
                                             <input class="input--style-5" type="password" name="password" id="password" placeholder="Password" required>
                                             <label class="label--desc"><span id="pavailability"></span></label>
-                                       </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
 
-                        
-                        <div align="right">
-                            <button class="btn btn--radius-2 btn--teal" name="btn_save_updates" type="submit" id="register">Register</button>
-                            <button class="btn btn--radius-2 btn--teal" name="clear" type="button" id="clear">Clear</button>
-                            <a href="../"><button class="btn btn--radius-2 btn--teal" type="button">Cancel
-                            </button></a>
-                        </div>
-                    </form>
                 </div>
+                <div align="right">
+                    <button class="btn btn--radius-2 btn--teal" name="btn_save_updates" type="submit" id="register">Register</button>
+                    <button class="btn btn--radius-2 btn--teal" name="clear" type="button" id="clear">Clear</button>
+                    <a href="../"><button class="btn btn--radius-2 btn--teal" type="button">Cancel
+                        </button></a>
+                </div>
+                </form>
             </div>
         </div>
     </div>
+    </div>
 
-    <?php include('footer.php'); ?> 
+    <?php include('footer.php'); ?>
 
-<script>  
- $(document).ready(function(){  
-   $('#username').blur(function(){
+    <script>
+        $(document).ready(function() {
+            $('#username').blur(function() {
 
-     var username = $(this).val();
+                var username = $(this).val();
 
-     $.ajax({
-      url:'check.php',
-      method:"POST",
-      data:{username:username},
-      success:function(data)
-      {
-       if(data != '0')
-       {
-        $('#availability').html('<span class="text-danger" style="color:red;">Enter a unique username.</span>');
-        $('#register').attr("disabled", true);
-       }
-       else if(username == "")
-       {
-        $('#availability').html('<span class="text-danger" style="color:orange;">Username is empty.</span>');
-        $('#register').attr("disabled", true);
-       }
-       else
-       {
-        $('#availability').html('<span class="text-success" style="color:green;">Username is unique.</span>');
-        $('#register').attr("disabled", false);
-       }
-      }
-     })
+                $.ajax({
+                    url: 'check.php',
+                    method: "POST",
+                    data: {
+                        username: username
+                    },
+                    success: function(data) {
+                        if (data != '0') {
+                            $('#availability').html('<span class="text-danger" style="color:red;">Enter a unique username.</span>');
+                            $('#register').attr("disabled", true);
+                        } else if (username == "") {
+                            $('#availability').html('<span class="text-danger" style="color:orange;">Username is empty.</span>');
+                            $('#register').attr("disabled", true);
+                        } else {
+                            $('#availability').html('<span class="text-success" style="color:green;">Username is unique.</span>');
+                            $('#register').attr("disabled", false);
+                        }
+                    }
+                })
 
-  });
+            });
 
-   $('#email').blur(function(){
+            $('#email').blur(function() {
 
-     var email = $(this).val();
+                var email = $(this).val();
 
-     $.ajax({
-      url:'check.php',
-      method:"POST",
-      data:{email:email},
-      success:function(data)
-      {
-       if(data != '0')
-       {
-        $('#eavailability').html('<span class="text-danger" style="color:red;">Email already exist! Try another one</span>');
-        $('#register').attr("disabled", true);
-       }
-       else if(email == "")
-       {
-        $('#eavailability').html('<span class="text-danger" style="color:orange;"> Type your e-mail address.</span>');
-        $('#register').attr("disabled", true);
-       }
-       else
-       {
-        $('#eavailability').html('<span class="text-success" style="color:green;"> Email is available.</span>');
-        $('#register').attr("disabled", false);
-       }
-      }
-     })
+                $.ajax({
+                    url: 'check.php',
+                    method: "POST",
+                    data: {
+                        email: email
+                    },
+                    success: function(data) {
+                        if (data != '0') {
+                            $('#eavailability').html('<span class="text-danger" style="color:red;">Email already exist! Try another one</span>');
+                            $('#register').attr("disabled", true);
+                        } else if (email == "") {
+                            $('#eavailability').html('<span class="text-danger" style="color:orange;"> Type your e-mail address.</span>');
+                            $('#register').attr("disabled", true);
+                        } else {
+                            $('#eavailability').html('<span class="text-success" style="color:green;"> Email is available.</span>');
+                            $('#register').attr("disabled", false);
+                        }
+                    }
+                })
 
-  });
+            });
 
-    $('#password').keyup(function(){
+            $('#password').keyup(function() {
 
-     var password = $(this).val();
+                var password = $(this).val();
 
-       if(password.length <= 6)
-       {
-        $('#pavailability').html('<span class="text-danger" style="color:red;">Enter 7 characters or more.</span>');
-        $('#register').attr("disabled", true);
-       }
-       else
-       {
-        $('#pavailability').html('<span class="text-success" style="color:green;">Remember this password.</span>');
-        $('#register').attr("disabled", false);
-       }
-      });
+                if (password.length <= 6) {
+                    $('#pavailability').html('<span class="text-danger" style="color:red;">Enter 7 characters or more.</span>');
+                    $('#register').attr("disabled", true);
+                } else {
+                    $('#pavailability').html('<span class="text-success" style="color:green;">Remember this password.</span>');
+                    $('#register').attr("disabled", false);
+                }
+            });
 
 
-    $('#clear').click(function(){
-    $('input[type="text"]').val("");
-    });
+            $('#clear').click(function() {
+                $('input[type="text"]').val("");
+            });
 
- });  
- 
- </script>
+        });
+    </script>
